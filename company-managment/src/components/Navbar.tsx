@@ -6,7 +6,7 @@ const nav = create({
     base: {
         textAlign: 'center',
         color: 'red',
-        fontSize: '22px'
+        fontSize: '120px'
     },
     highlighted: {
         color: 'rebeccapurple',
