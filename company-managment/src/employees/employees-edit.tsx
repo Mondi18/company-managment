@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -6,8 +6,9 @@ import TextField from '@mui/material/TextField'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import InputLabel from '@mui/material/InputLabel'
-import { JobPosition } from '../data/type'
-import { Level } from '../data/type'
+import Button from '@mui/material/Button';
+import { addEmployees } from '../firebase/index.ts'
+import { Employee, JobPosition, Level } from '../data/type'
 import { create, props } from '@stylexjs/stylex'
 
 const FormStyle = create({
@@ -38,10 +39,52 @@ const FormStyle = create({
         marginTop: '1rem',
         width: '100%',
         maxWidth: '600px',
-    },
+    }
 });
 
 function EmployeesEdit() {
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isBusy, setIsBusy] = useState(false);
+    const [jobPosition, setJobPosition] = useState<JobPosition | ''>('');
+    const [level, setLevel] = useState<Level | ''>('');
+    const [salary, setSalary] = useState(0);
+
+    const handleSubmit = async () => {
+        if (!firstName || !lastName || !email || !phoneNumber || !jobPosition || !level || !salary) {
+            alert('Please fill in all fields');
+            return;
+        }
+        const newEmployee: Employee = {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            level,
+            jobPosition,
+            salary: 0,
+            isBusy
+        };
+        try {
+            await addEmployees(newEmployee);
+            console.log('Employee added successfully!');
+
+            setFirstName('');
+            setLastName('');
+            setEmail('');
+            setPhoneNumber('');
+            setLevel('');
+            setJobPosition('');
+            setIsBusy(false);
+            setSalary(0);
+        } catch (error) {
+            console.error('Error adding employee:', error)
+        }
+
+    };
     return (
         <div {...props(FormStyle.base)}>
             <div {...props(FormStyle.textFieldContainer)}>
@@ -50,12 +93,16 @@ function EmployeesEdit() {
                         id="first-name"
                         label="First Name"
                         variant="filled"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                         {...props(FormStyle.textField)}
                     />
                     <TextField
                         id="last-name"
                         label="Last Name"
                         variant="filled"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
                         {...props(FormStyle.textField)}
                     />
                 </div>
@@ -64,23 +111,37 @@ function EmployeesEdit() {
                         id="email"
                         label="Email"
                         variant="filled"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         {...props(FormStyle.textField)}
                     />
                     <TextField
                         id="phone-number"
                         label="Phone Number"
                         variant="filled"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        {...props(FormStyle.textField)}
+                    />
+                    <TextField
+                        id="salary"
+                        label="Salary"
+                        type="number"
+                        variant="filled"
+                        value={salary}
+                        onChange={(e) => setSalary(e.target.value ? parseFloat(e.target.value) : 0)}
                         {...props(FormStyle.textField)}
                     />
                 </div>
             </div>
-            <FormControlLabel control={<Checkbox />} label="Busy" />
+            <FormControlLabel control={<Checkbox checked={isBusy} onChange={() => setIsBusy(!isBusy)} />} label="Busy" />
             <FormControl variant="filled" {...props(FormStyle.formControl)}>
                 <InputLabel id="job-position-label">Job Position</InputLabel>
                 <Select
                     labelId="job-position-label"
                     id="job-position-select"
-                    defaultValue=""
+                    value={jobPosition}
+                    onChange={(e) => setJobPosition(e.target.value as JobPosition)}
                 >
                     {Object.values(JobPosition)
                         .filter(value => typeof value === 'string')
@@ -96,7 +157,8 @@ function EmployeesEdit() {
                 <Select
                     labelId="level-label"
                     id="level-select"
-                    defaultValue=""
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value as Level)}
                 >
                     {Object.values(Level)
                         .filter(value => typeof value === 'string')
@@ -107,6 +169,14 @@ function EmployeesEdit() {
                         ))}
                 </Select>
             </FormControl>
+            <Button
+                type="button"
+                variant="contained"
+                onClick={handleSubmit}
+                style={{ marginTop: '2rem' }}
+            >
+                Add Employee
+            </Button>
         </div>
     );
 }
