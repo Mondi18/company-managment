@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./config";
 import { getAuth } from 'firebase/auth';
-import { get, getDatabase, ref, set, push, update } from "firebase/database";
+import { get, getDatabase, ref, set, push, update, remove } from "firebase/database";
 
 import {
     getFirestore,
@@ -28,6 +28,11 @@ export const addEmployees = async (employee: Employee): Promise<void> => {
 }
 
 export const updateEmployees = async (employeeId: string, partialEmployee: Partial<Employee>): Promise<void> => {
-    const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
-    await update(employeeRef, partialEmployee);
+    const EmployeeRef = ref(realtime, `/work/employee/${employeeId}`);
+    await update(EmployeeRef, partialEmployee);
+}
+
+export const deleteEmployee = async (employeeId: string): Promise<void> => {
+    const EmployeeRef = ref(realtime, `/work/employee/${employeeId}`);
+    await remove(EmployeeRef);
 }
