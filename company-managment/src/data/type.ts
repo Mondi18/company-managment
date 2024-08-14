@@ -4,7 +4,8 @@ export type Employee = {
     firstName: string,
     email: string
     level: Level;
-    jobPosition: JobPosition
+    jobPosition: JobPosition;
+    salary: number
 
 }
 export enum Level {
