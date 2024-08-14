@@ -1,25 +1,30 @@
-
-
-import { create, props } from '@stylexjs/stylex'
-
-const nav = create({
-    base: {
-        textAlign: 'center',
-        color: 'red',
-        fontSize: '120px'
-    },
-    highlighted: {
-        color: 'rebeccapurple',
-    },
-});
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+    const navigate = useNavigate();
 
     return (
-        <div {...props(nav.base, nav.highlighted)}>
-            Navbar
-        </div>
-    )
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static">
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        CompanyManagment
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button color="inherit" onClick={() => navigate("")}>Login</Button> 
+                        <Button color="inherit" onClick={() => navigate("employees-list")}>Employees</Button>
+                        <Button color="inherit" onClick={() => navigate("home")}>Home</Button>
+                        <Button color="inherit" onClick={() => navigate("")}>Logout</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+        </Box>
+    );
 }
 
-export default Navbar
+export default Navbar;
