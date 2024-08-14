@@ -2,6 +2,7 @@ export type Employee = {
     lastName: string,
     firstName: string,
     email: string,
+    phoneNumber: string,
     level: Level,
     jobPosition: JobPosition,
     salary: number,
@@ -20,3 +21,4 @@ export enum JobPosition {
     DevOps,
     TeamLeader
 }
+
