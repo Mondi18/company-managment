@@ -15,7 +15,7 @@ export const db = getFirestore(app);
 export const realtime = getDatabase(app);
 
 export const listEmployees = async (): Promise<Record<string, Employee> | undefined> => {
-    const EmployeesRef = ref(realtime, '/work/employees');
+    const EmployeesRef = ref(realtime, '/work/employee');
     const snapshot = await get(EmployeesRef);
     if (!snapshot.exists()) return undefined;
     return snapshot.val();
