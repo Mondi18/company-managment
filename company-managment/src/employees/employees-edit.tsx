@@ -39,6 +39,11 @@ const FormStyle = create({
         marginTop: '1rem',
         width: '100%',
         maxWidth: '600px',
+    },
+    errorMessage:{
+     marginTop:'2rem',
+     fontWeight:'bolder',
+     color:'red'
     }
 });
 
@@ -52,10 +57,11 @@ function EmployeesEdit() {
     const [jobPosition, setJobPosition] = useState<JobPosition | ''>('');
     const [level, setLevel] = useState<Level | ''>('');
     const [salary, setSalary] = useState(0);
+    const [errorMessage,setErrorMessage]=useState<string | null>(null);    
 
     const handleSubmit = async () => {
         if (!firstName || !lastName || !email || !phoneNumber || !jobPosition || !level || !salary) {
-            alert('Please fill in all fields');
+            setErrorMessage('Please fill in all fields');
             return;
         }
         const newEmployee: Employee = {
@@ -65,7 +71,7 @@ function EmployeesEdit() {
             phoneNumber,
             level,
             jobPosition,
-            salary: 0,
+            salary,
             isBusy
         };
         try {
@@ -159,7 +165,7 @@ function EmployeesEdit() {
                     id="level-select"
                     value={level}
                     onChange={(e) => setLevel(e.target.value as Level)}
-                >
+                    >
                     {Object.values(Level)
                         .filter(value => typeof value === 'string')
                         .map((level) => (
@@ -174,9 +180,10 @@ function EmployeesEdit() {
                 variant="contained"
                 onClick={handleSubmit}
                 style={{ marginTop: '2rem' }}
-            >
+                >
                 Add Employee
             </Button>
+        <span {...props(FormStyle.errorMessage)}>{errorMessage}</span>
         </div>
     );
 }
