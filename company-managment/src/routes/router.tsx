@@ -3,6 +3,7 @@ import Login from "../components/Login"
 import Home from "../components/Home";
 import Root from "./Root";
 import Order from "../components/Order";
+import EmployeesEdit from "../employees/employees-edit";
 const router = createBrowserRouter([
     {
         path: '/',
@@ -36,6 +37,12 @@ const router = createBrowserRouter([
                 path: 'login',
                 element: <Login />,
             },
+            {
+
+                path:'employees-edit',
+                element:<EmployeesEdit/>
+            }
+
         ],
     },
 ]);
