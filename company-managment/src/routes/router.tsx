@@ -4,6 +4,7 @@ import Home from "../components/Home";
 import Root from "./Root";
 import Order from "../components/Order";
 import EmployeesEdit from "../employees/employees-edit";
+import EmployeesList from "../employees/employees-list";
 const router = createBrowserRouter([
     {
         path: '/',
@@ -41,8 +42,11 @@ const router = createBrowserRouter([
 
                 path:'employees-edit',
                 element:<EmployeesEdit/>
-            }
-
+            },
+            {
+                path:'employees-list',
+                element: <EmployeesList/>
+            },
         ],
     },
 ]);
