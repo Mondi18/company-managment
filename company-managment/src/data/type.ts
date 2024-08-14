@@ -1,12 +1,11 @@
 export type Employee = {
-    id: number,
     lastName: string,
     firstName: string,
-    email: string
-    level: Level;
-    jobPosition: JobPosition;
-    salary: number
-
+    email: string,
+    level: Level,
+    jobPosition: JobPosition,
+    salary: number,
+    isBusy: boolean,
 }
 export enum Level {
     Junior,
