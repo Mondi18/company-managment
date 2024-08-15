@@ -2,9 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../components/Login"
 import Home from "../components/Home";
 import Root from "./Root";
-import Order from "../components/Order";
 import EmployeesEdit from "../employees/employees-edit";
 import EmployeesList from "../employees/employees-list";
+import OrderForm from "../orders/order-form";
 const router = createBrowserRouter([
     {
         path: '/',
@@ -16,19 +16,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/home',
-                element: (
-
-                    <Home />
-
-                ),
-            },
-            {
-                path: '/order',
-                element: (
-
-                    <Order />
-
-                ),
+                element: <Home />  
             },
             {
                 path: 'reviews',
@@ -47,6 +35,10 @@ const router = createBrowserRouter([
                 path:'employees-list',
                 element: <EmployeesList/>
             },
+            {
+                path:'order-form',
+                element: <OrderForm/>
+            }
         ],
     },
 ]);

@@ -20,6 +20,7 @@ const Navbar = () => {
                         <Button color="inherit" onClick={() => navigate("employees-list")}>Employees</Button>
                         <Button color="inherit" onClick={() => navigate("home")}>Home</Button>
                         <Button color="inherit" onClick={() => navigate("")}>Logout</Button>
+                        <Button color="inherit" onClick={() => navigate("order-form")}>Contact</Button>
                     </Box>
                 </Toolbar>
             </AppBar>

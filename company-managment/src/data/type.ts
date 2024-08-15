@@ -52,4 +52,5 @@ export enum WebStatus {
     Processing,
     InProgress,
     Competed
+
 }
