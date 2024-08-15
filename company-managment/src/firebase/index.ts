@@ -13,7 +13,7 @@ import {
     updateDoc,
     deleteDoc,
 } from 'firebase/firestore';
-import { Employee, Order, WebStatus, Web, WebStyle } from "../data/type";
+import { Employee, Order } from "../data/type";
 
 
 // Initialize Firebase
@@ -94,20 +94,3 @@ export const deleteOrder = async (orderId: string): Promise<void> => {
         console.error("Error deleting document :", error)
     }
 }
-
-/*const newOrder: Order = {
-    goal: Web.Blog,
-    pages: 5,
-    style: WebStyle.Minimalist,
-    service: true,
-    deadline: new Date(),
-    notice: [],
-    status: WebStatus.Processing,
-    price: 1000
-};
-addOrder(newOrder);
-const orders = listOrders();
-console.log(orders);
-getOrderById('cdpA55ZRj2DQ3X888gJS').then(order => console.log(order));
-updateOrder('cdpA55ZRj2DQ3X888gJS', { status: WebStatus.InProgress });
-deleteOrder('cdpA55ZRj2DQ3X888gJS');*/
