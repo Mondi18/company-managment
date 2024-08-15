@@ -8,6 +8,18 @@ export type Employee = {
     salary: number,
     isBusy: boolean,
 }
+
+export type Order = {
+    goal: Web,
+    pages: number,
+    style: WebStyle,
+    service: boolean,
+    deadline: Date,
+    notice: string[],
+    status: WebStatus,
+    price: number
+}
+
 export enum Level {
     Junior,
     Medior,
@@ -40,14 +52,5 @@ export enum WebStatus {
     Processing,
     InProgress,
     Competed
-}
-export type Order = {
-    goal: Web,
-    pages: number,
-    style: WebStyle,
-    service: boolean,
-    deadline: Date,
-    notice: string[],
-    status: WebStatus,
-    price: number
+
 }
