@@ -58,10 +58,11 @@ export default function OrderForm() {
     const [notice, setNotice] = useState<string | ''>('');
 
     const sendOrder = async () => {
-        if (!pages || !style || !web || !deadline || !price || !service) {
+        // Update the validation condition to remove `service`
+        if (!pages || !style || !web || !deadline || !price) {
             return;
         }
-
+    
         const newOrder: Order = {
             web,
             style,
@@ -72,8 +73,7 @@ export default function OrderForm() {
             notice,
             status: WebStatus.Processing
         };
-        console.log('AA');
-        
+    
         try {
             await addOrder(newOrder);
             console.log('Order added successfully!');
@@ -88,6 +88,7 @@ export default function OrderForm() {
             console.error('Error adding order:', error);
         }
     };
+    
 
     return (
         <>
