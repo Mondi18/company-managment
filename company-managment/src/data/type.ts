@@ -63,6 +63,6 @@ export enum WebStyle {
 export enum WebStatus {
     Processing,
     InProgress,
-    Competed
+    Completed
 
 }
