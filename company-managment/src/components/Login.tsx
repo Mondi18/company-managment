@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { loginUser, logoutUser, signInWithGoogle, onAuthStateChangeListener } from '../firebase';
-import { User } from 'firebase/auth';
+import { loginUser, logoutUser, onAuthStateChangeListener, auth } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
+import { Button, TextField } from '@mui/material';
 
 
 
@@ -38,8 +39,8 @@ const Login = () => {
 
     const handleGoogleSignIn = async () => {
         try {
-            await signInWithGoogle();
-            console.log("nagyon mennőő")
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
             console.log('Login with Google successful!');
         } catch (error) {
             console.log('Login with Google failed. Check the console for details.');
@@ -52,26 +53,28 @@ const Login = () => {
             <h2>Login</h2>
             {!user ? (
                 <>
-                    <input
+                    <TextField
                         type="email"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        size='small'
                     />
-                    <input
+                    <TextField
                         type="password"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        size='small'
                     />
-                    <button onClick={handleLogin}>Login</button>
+                    <Button onClick={handleLogin} variant="contained">Login</Button>
                     <hr />
-                    <button onClick={handleGoogleSignIn}>Login with Google</button>
+                    <Button variant="contained" onClick={handleGoogleSignIn}>Login with Google</Button>
                 </>
             ) : (
                 <>
                     <p>Welcome, {user.email}</p>
-                    <button onClick={handleLogout}>Logout</button>
+                    <Button variant="contained" onClick={handleLogout}>Logout</Button>
                 </>
             )}
         </div>
