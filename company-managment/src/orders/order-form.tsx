@@ -51,26 +51,25 @@ const WebOptions = Object.values(Web).filter(value => typeof value === 'string')
 export default function OrderForm() {
     const [web, setWeb] = useState<Web | ''>('');
     const [style, setStyle] = useState<WebStyle | ''>('');
-    const [pages, setPages] = useState<number | ''>('');
+    const [pages, setPages] = useState<number>(0);
     const [deadline, setDeadline] = useState<Date | ''>('');
     const [price, setPrice] = useState<number | ''>('');
     const [service, setService] = useState<boolean>(false);
     const [notice, setNotice] = useState<string | ''>('');
 
     const sendOrder = async () => {
-        // Update the validation condition to remove `service`
-        if (!pages || !style || !web || !deadline || !price) {
+        if (!style || !web) {
             return;
         }
     
         const newOrder: Order = {
             web,
             style,
-            pages,
-            deadline,
-            price,
-            service,
-            notice,
+            pages: pages || 0,     
+            deadline: deadline || new Date(), 
+            price: price || 0,      
+            service: service || false,
+           notice: notice || '',     
             status: WebStatus.Processing
         };
     
@@ -79,16 +78,16 @@ export default function OrderForm() {
             console.log('Order added successfully!');
             setWeb('');
             setStyle('');
-            setPages('');
-            setDeadline('');
-            setPrice('');
+            setPages(0);        
+            setDeadline('');     
+            setPrice('');        
             setService(false);
             setNotice('');
         } catch (error) {
             console.error('Error adding order:', error);
         }
     };
-    
+
 
     return (
         <>
