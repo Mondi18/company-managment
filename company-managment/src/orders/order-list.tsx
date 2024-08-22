@@ -7,27 +7,27 @@ import { Timestamp } from 'firebase/firestore';
 
 const styles = create({
     headerCell: {
-      width: '14.2857%',
-      textAlign: 'center',
-      border: '1px solid #ddd',
-      padding: '8px',
+        width: '14.2857%',
+        textAlign: 'center',
+        border: '1px solid #ddd',
+        padding: '8px',
     },
     tableCell: {
-      textAlign: 'center',
-      border: '1px solid #ddd',
-      padding: '8px',
+        textAlign: 'center',
+        border: '1px solid #ddd',
+        padding: '8px',
     },
     tr: {
-      cursor: "pointer"
+        cursor: "pointer"
     },
     bg: {
-      backgroundColor: 'bisque'
+        backgroundColor: 'bisque'
     },
     button: {
-      margin: '0.5rem',
-      color: 'red'
+        margin: '0.5rem',
+        color: 'red'
     }
-  });
+});
 
 const OrderList = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -37,7 +37,7 @@ const OrderList = () => {
             const orders = await listOrders();
             if (orders) {
                 setOrders(Object.values(orders));
-                
+
             } else {
                 setOrders([]);
             }
@@ -47,20 +47,21 @@ const OrderList = () => {
     const formatDeadline = (deadline: Timestamp | Date) => {
         const date = deadline instanceof Timestamp ? deadline.toDate() : deadline;
         return date.toLocaleDateString('hu-HU');
-    };   
-    
-const getStatusText = (status: WebStatus): string => {
-    switch (status) {
-        case WebStatus.Processing:
-            return 'Feldolgozás alatt';
-        case WebStatus.InProgress:
-            return 'Folyamatban';
-        case WebStatus.Competed:
-            return 'Befejezve';
-        default:
-            return 'Ismeretlen';
-    }
-};
+    };
+
+    const getStatusText = (status: WebStatus): string => {
+        switch (status) {
+            case WebStatus.Processing:
+                return 'Feldolgozás alatt';
+            case WebStatus.InProgress:
+                return 'Folyamatban';
+            case WebStatus.Completed:
+                return 'Befejezve';
+            default:
+                return 'Ismeretlen';
+        }
+    };
+
     return (
         <div>
             <Table>
@@ -79,7 +80,7 @@ const getStatusText = (status: WebStatus): string => {
                 <tbody>
                     {orders.map((order, index) => (
                         <tr key={index}>
-                            <td {...props(styles.tableCell)}>{order.web ? 'Igen' : 'Nem'}</td>
+                            <td {...props(styles.tableCell)}>{order.web || "Ismeretlen"}</td>
                             <td {...props(styles.tableCell)}>{order.pages}</td>
                             <td {...props(styles.tableCell)}>{order.style}</td>
                             <td {...props(styles.tableCell)}>{order.service ? 'Igen' : 'Nem'}</td>
