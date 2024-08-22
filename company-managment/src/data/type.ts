@@ -20,6 +20,18 @@ export type Order = {
     price: number
 }
 
+export type CustomerUser = {
+    uid: string,
+    email: string,
+    role: UserRole,
+    orders?: Order[];
+}
+
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin'
+}
+
 export enum Level {
     Junior,
     Medior,
