@@ -44,9 +44,10 @@ const router = createBrowserRouter([
                 element: <OrderForm/>
             },
             {
-                path:'order-list',
-                element: <OrderList/>
-
+                path: 'order-list',
+                element: <OrderList />
+            },
+            {
                 path: 'order-form',
                 element: <OrderForm />
             }
