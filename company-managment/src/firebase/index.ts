@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./config";
-import { getAuth } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import { get, getDatabase, ref, set, push, update, remove } from "firebase/database";
+import { CustomerUser, UserRole } from "../data/type";
 
 import {
     collection,
@@ -12,8 +13,10 @@ import {
     getDoc,
     updateDoc,
     deleteDoc,
+    setDoc,
 } from 'firebase/firestore';
 import { Employee, Order } from "../data/type";
+import { GoogleAuthProvider } from "firebase/auth/web-extension";
 
 
 // Initialize Firebase
@@ -23,6 +26,10 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const realtime = getDatabase(app);
 
+
+export const onAuthStateChangeListener = (callback: (user: User | null) => void) => {
+    return onAuthStateChanged(auth, callback);
+};
 //employee CRUD operations
 
 export const listEmployees = async (): Promise<Record<string, Employee> | undefined> => {
@@ -93,4 +100,67 @@ export const deleteOrder = async (orderId: string): Promise<void> => {
     } catch (error) {
         console.error("Error deleting document :", error)
     }
+}
+
+// User Register , Login, Logput with email and password
+
+export const registerUser = async (email: string, password: string): Promise<void> => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userRef = doc(db, 'users', user.uid);
+        const customerUser: CustomerUser = {
+            uid: user.uid,
+            email: user.email || '',
+            role: UserRole.USER
+        };
+        await setDoc(userRef, customerUser);
+        console.log('User registering was successfully!')
+
+    } catch (error) {
+        console.error('Error registering user:', error);
+    }
+}
+
+export const loginUser = async (email: string, password: string): Promise<void> => {
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        console.log('User signed in');
+    } catch (error) {
+        console.error('Error signin in:', error);
+    }
+}
+
+export const logoutUser = async (): Promise<void> => {
+    try {
+        await signOut(auth);
+        console.log('User signed out');
+    } catch (error) {
+        console.error('Error signin out:', error);
+    }
+}
+
+// Login with Google auth
+
+export const signInWithGoogle = async (): Promise<void> => {
+    try {
+        const provider = new GoogleAuthProvider();
+
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        console.log(user);
+
+        const userDocRef = doc(db, 'users', user.uid);
+        const customUser: CustomerUser = {
+            uid: user.uid,
+            email: user.email || '',
+            role: UserRole.USER
+        };
+        await setDoc(userDocRef, customUser, { merge: true });
+        console.log('User signed in with Google');
+    } catch (error) {
+        console.error('Error signing in with Google:', error);
+    }
+
 }
