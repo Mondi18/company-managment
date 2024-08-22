@@ -10,12 +10,12 @@ export type Employee = {
 }
 
 export type Order = {
-    goal: Web,
+    web: Web,
     pages: number,
     style: WebStyle,
     service: boolean,
     deadline: Date,
-    notice: string[],
+    notice: string,
     status: WebStatus,
     price: number
 }

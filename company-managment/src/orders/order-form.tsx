@@ -1,8 +1,10 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, Grid, Box } from "@mui/material";
+import { TextField, Checkbox, FormControlLabel, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { props, create } from "@stylexjs/stylex";
 import { useState } from "react";
-import { WebStyle } from "../data/type";
-import { Web } from "../data/type";
+import { WebStyle, Web, Order, WebStatus } from "../data/type";
+import Textarea from "@mui/joy/Textarea";
+import Button from "@mui/joy/Button";
+import { addOrder } from "../firebase";
 
 const FormPageStyle = create({
     h1: {
@@ -22,7 +24,7 @@ const FormPageStyle = create({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '1rem'
+        gap: '1rem',
     },
     formControl: {
         width: '200px'
@@ -35,98 +37,137 @@ const FormPageStyle = create({
         justifyContent: 'center',
         marginTop: '5rem',
         textAlign: 'center',
-        width:'35rem'
+        width: '35rem'
+    },
+    textArea: {
+        width: '400px',
+        height: '10rem'
     }
 });
 
+const WebStyleOptions = Object.values(WebStyle).filter(value => typeof value === 'string');
+const WebOptions = Object.values(Web).filter(value => typeof value === 'string');
+
 export default function OrderForm() {
-    const [type, setType] = useState<WebStyle | ''>('');
     const [web, setWeb] = useState<Web | ''>('');
+    const [style, setStyle] = useState<WebStyle | ''>('');
+    const [pages, setPages] = useState<number>(0);
+    const [deadline, setDeadline] = useState<Date | ''>('');
+    const [price, setPrice] = useState<number | ''>('');
+    const [service, setService] = useState<boolean>(false);
+    const [notice, setNotice] = useState<string | ''>('');
+
+    const sendOrder = async () => {
+        if (!style || !web) {
+            return;
+        }
+    
+        const newOrder: Order = {
+            web,
+            style,
+            pages: pages || 0,     
+            deadline: deadline || new Date(), 
+            price: price || 0,      
+            service: service || false,
+           notice: notice || '',     
+            status: WebStatus.Processing
+        };
+    
+        try {
+            await addOrder(newOrder);
+            console.log('Order added successfully!');
+            setWeb('');
+            setStyle('');
+            setPages(0);        
+            setDeadline('');     
+            setPrice('');        
+            setService(false);
+            setNotice('');
+        } catch (error) {
+            console.error('Error adding order:', error);
+        }
+    };
+
 
     return (
-        <Box display="flex" flexDirection="column" alignItems="center">
-            <h1 {...props(FormPageStyle.h1)}>Get in Touch</h1>
-            <p {...props(FormPageStyle.p)}>
-                We’re here to assist with all your web design needs! If you have any questions, need a quote, or just want to discuss your project,
-                <br />don’t hesitate to reach out. You can email us at contact@webdesigner.com or call us at (123) 456-7890.<br />
-                Our team is available Monday through Friday, from 9 AM to 5 PM, and we strive to respond to all inquiries within 24 hours.
-                <br />Follow us on social media for the latest updates and insights into our work. We look forward to hearing from you!
-            </p>
-            <Box width="100%" maxWidth="600px"> 
-                <Grid container spacing={2} justifyContent="center">
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            id="first-name"
-                            label="What can we help you?"
-                            variant="filled"
-                            {...props(FormPageStyle.textField)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            id="full-name"
-                            label="Full Name"
-                            variant="filled"
-                            {...props(FormPageStyle.textField)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            id="email"
-                            label="Email"
-                            variant="filled"
-                            {...props(FormPageStyle.textField)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            id="phone-number"
-                            label="Phone Number"
-                            variant="filled"
-                            {...props(FormPageStyle.textField)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl variant="filled" {...props(FormPageStyle.formControl)}>
-                            <InputLabel id="type-type-label">Type</InputLabel>
-                            <Select
-                                labelId="type-type-label"
-                                id="type-type-select"
-                                value={type}
-                                onChange={(event) => setType(event.target.value as WebStyle)}
-                            >
-                                {Object.values(WebStyle).filter(value => typeof value === 'string').map((value) => (
-                                    <MenuItem key={value} value={value}>
-                                        {value}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl variant="filled" {...props(FormPageStyle.formControl)}>
-                            <InputLabel id="web-type-label">Web Type</InputLabel>
-                            <Select
-                                labelId="web-type-label"
-                                id="web-type-select"
-                                value={web}
-                                onChange={(event) => setWeb(event.target.value as Web)}
-                            >
-                                {Object.values(Web).filter(value => typeof value === 'string').map((value) => (
-                                    <MenuItem key={value} value={value}>
-                                        {value}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-                
-                <Box  {...props(FormPageStyle.button)}>
-                    <Button variant="contained">Send</Button>
-                </Box>
-                
-            </Box>
-        </Box>
+        <>
+            <div>
+                <h1 {...props(FormPageStyle.h1)}>Get in Touch</h1>
+                <p {...props(FormPageStyle.p)}>
+                    We’re here to assist with all your web design needs! If you have any questions, need a quote, or just want to discuss your project,
+                    <br />don’t hesitate to reach out. You can email us at contact@webdesigner.com or call us at (123) 456-7890.<br />
+                    Our team is available Monday through Friday, from 9 AM to 5 PM, and we strive to respond to all inquiries within 24 hours.
+                    <br />Follow us on social media for the latest updates and insights into our work. We look forward to hearing from you!
+                </p>
+            </div>
+            <div {...props(FormPageStyle.inputFields)}>
+                <TextField
+                    placeholder="Pages"
+                    type="number"
+                    value={pages}
+                    onChange={(e) => setPages(Number(e.target.value))}
+                    {...props(FormPageStyle.textField)}
+                />
+                <FormControlLabel
+                    control={<Checkbox checked={service} onChange={(e) => setService(e.target.checked)} />}
+                    label="Service"
+                />
+                <TextField
+                    placeholder="Deadline"
+                    type="date"
+                    value={deadline ? deadline.toISOString().split('T')[0] : ''}
+                    onChange={(e) => setDeadline(new Date(e.target.value))}
+                    {...props(FormPageStyle.textField)}
+                />
+                <TextField
+                    placeholder="Price ($)"
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    {...props(FormPageStyle.textField)}
+                />
+
+                <FormControl variant="filled" {...props(FormPageStyle.formControl)}>
+                    <InputLabel id="web-style-label">Web Style</InputLabel>
+                    <Select
+                        labelId="web-style-label"
+                        id="web-style-select"
+                        value={style}
+                        onChange={(e) => setStyle(e.target.value as WebStyle)}
+                    >
+                        {WebStyleOptions.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <FormControl variant="filled" {...props(FormPageStyle.formControl)}>
+                    <InputLabel id="web-label">Web</InputLabel>
+                    <Select
+                        labelId="web-label"
+                        id="web-select"
+                        value={web}
+                        onChange={(e) => setWeb(e.target.value as Web)}
+                    >
+                        {WebOptions.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <Textarea
+                    minRows={2}
+                    value={notice}
+                    placeholder="How can we help you?"
+                    color="neutral"
+                    onChange={(e) => setNotice(e.target.value)}
+                    {...props(FormPageStyle.textArea)}
+                />
+                <Button size="lg" onClick={sendOrder}>Send</Button>
+            </div>
+        </>
     );
 }
