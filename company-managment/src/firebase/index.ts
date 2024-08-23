@@ -25,7 +25,22 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const realtime = getDatabase(app);
+const provider = new GoogleAuthProvider();
 
+export const loginPopup = async () => {
+    console.log('::loginPopup');
+
+    const { user } = await signInWithPopup(auth, provider);
+    console.log(user);
+    const document = await getDoc(doc(db, 'users', user.uid));
+    console.log(document);
+
+    if (!document.exists() && user) {
+        console.log('!!! We have user !!!');
+    }
+};
+
+export const logout = () => signOut(auth);
 
 export const onAuthStateChangeListener = (callback: (user: User | null) => void) => {
     return onAuthStateChanged(auth, callback);
@@ -164,3 +179,4 @@ export const signInWithGoogle = async (): Promise<void> => {
     }
 
 }
+
