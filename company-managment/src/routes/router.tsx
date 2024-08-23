@@ -6,7 +6,6 @@ import EmployeesEdit from "../employees/employees-edit";
 import EmployeesList from "../employees/employees-list";
 import OrderForm from "../orders/order-form";
 import OrderList from "../orders/order-list";
-import Register from "../components/Register";
 
 const router = createBrowserRouter([
     {
@@ -15,9 +14,10 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '',
-                element: <Register />,
+                element: <Login />,
             },
             {
+                
                 path: '/home',
                 element: <Home />
             },
