@@ -147,15 +147,6 @@ export const loginUser = async (email: string, password: string): Promise<void> 
     }
 }
 
-export const logoutUser = async (): Promise<void> => {
-    try {
-        await signOut(auth);
-        console.log('User signed out');
-    } catch (error) {
-        console.error('Error signin out:', error);
-    }
-}
-
 // Login with Google auth
 
 export const signInWithGoogle = async (): Promise<void> => {
