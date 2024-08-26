@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
-import { loginUser, logoutUser, onAuthStateChangeListener, auth } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
+import { onAuthStateChangeListener } from '../firebase';
+import { User } from 'firebase/auth';
 import { Button, TextField } from '@mui/material';
+import { logout } from '../firebase';
+import { signInWithGoogle } from '../firebase';
+import { loginUser } from '../firebase';
 
 
 
@@ -17,36 +20,6 @@ const Login = () => {
 
         return () => unsubscribe();
     }, []);
-    const handleLogin = async () => {
-        try {
-            await loginUser(email, password);
-            console.log('Login successful!');
-        } catch (error) {
-            console.log('Login failed. Check the console for details.');
-            console.error('Login error:', error);
-        }
-    };
-    const handleLogout = async () => {
-        try {
-            await logoutUser();
-            console.log("Log out is successfully!");
-
-        } catch (error) {
-            console.log('Logout failed. Check the console for details.');
-            console.error('Logout error:', error);
-        }
-    }
-
-    const handleGoogleSignIn = async () => {
-        try {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-            console.log('Login with Google successful!');
-        } catch (error) {
-            console.log('Login with Google failed. Check the console for details.');
-            console.error('Google Sign-In error:', error);
-        }
-    };
 
     return (
         <div>
@@ -67,14 +40,14 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         size='small'
                     />
-                    <Button onClick={handleLogin} variant="contained">Login</Button>
+                    <Button variant="contained" onClick={() => loginUser(email, password)}>Login</Button>
                     <hr />
-                    <Button variant="contained" onClick={handleGoogleSignIn}>Login with Google</Button>
+                    <Button variant="contained" onClick={signInWithGoogle}>Login with Google</Button>
                 </>
             ) : (
                 <>
                     <p>Welcome, {user.email}</p>
-                    <Button variant="contained" onClick={handleLogout}>Logout</Button>
+                    <Button variant="contained" onClick={logout}>Logout</Button>
                 </>
             )}
         </div>
