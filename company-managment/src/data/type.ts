@@ -28,7 +28,7 @@ export type CustomerUser = {
     uid: string,
     email: string,
     role: UserRole,
-    orders?: Order[];
+    ordersid?: Order[];
 }
 
 export enum UserRole {
