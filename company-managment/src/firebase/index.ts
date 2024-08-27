@@ -158,7 +158,7 @@ export const loginUser = async (email: string, password: string): Promise<void> 
 
 export const assignEmployeeToOrder = async (orderId: string, employeeId: string): Promise<void> => {
     try {
-        const orderRef = doc(db, 'orders', orderId);
+        const orderRef = doc(db, 'order', orderId);
         const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
 
         // Ellenőrizzük, hogy létezik-e az alkalmazott
