@@ -8,7 +8,7 @@ import { Employee } from '../data/type';
 
 const styles = create({
     headerCell: {
-        width: '14.2857%',
+        width: '8.2857%',
         textAlign: 'center',
         border: '1px solid #ddd',
         padding: '8px',
@@ -119,6 +119,8 @@ const OrderList = () => {
                         <th {...props(styles.headerCell)}>Notice</th>
                         <th {...props(styles.headerCell)}>Status</th>
                         <th {...props(styles.headerCell)}>Price</th>
+                        <th {...props(styles.headerCell)}>Employee</th>
+                        <th {...props(styles.headerCell)}>View</th>
                     </tr>
                 </thead>
                 <tbody>
