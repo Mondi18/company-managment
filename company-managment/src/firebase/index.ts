@@ -16,8 +16,7 @@ import {
     setDoc,
 } from 'firebase/firestore';
 import { Employee, Order } from "../data/type";
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
-
+import { GoogleAuthProvider } from "firebase/auth"
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -25,7 +24,31 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const realtime = getDatabase(app);
+const provider = new GoogleAuthProvider();
 
+export const loginPopup = async () => {
+    console.log('::loginPopup');
+
+    const { user } = await signInWithPopup(auth, provider);
+    console.log(user);
+
+    const document = await getDoc(doc(db, 'users', user.uid));
+    console.log(document);
+
+    if (!document.exists() && user) {
+        const userRef = doc(db, 'users', user.uid);
+
+        const newCustomerUser: CustomerUser = {
+            uid: user.uid,
+            email: user.email || '',
+            role: UserRole.USER
+        };
+        await setDoc(userRef, newCustomerUser);
+        console.log('!!! We have user !!!');
+    }
+};
+
+export const logout = () => signOut(auth);
 
 export const onAuthStateChangeListener = (callback: (user: User | null) => void) => {
     return onAuthStateChanged(auth, callback);
@@ -130,37 +153,4 @@ export const loginUser = async (email: string, password: string): Promise<void> 
     } catch (error) {
         console.error('Error signin in:', error);
     }
-}
-
-export const logoutUser = async (): Promise<void> => {
-    try {
-        await signOut(auth);
-        console.log('User signed out');
-    } catch (error) {
-        console.error('Error signin out:', error);
-    }
-}
-
-// Login with Google auth
-
-export const signInWithGoogle = async (): Promise<void> => {
-    try {
-        const provider = new GoogleAuthProvider();
-
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        console.log(user);
-
-        const userDocRef = doc(db, 'users', user.uid);
-        const customUser: CustomerUser = {
-            uid: user.uid,
-            email: user.email || '',
-            role: UserRole.USER
-        };
-        await setDoc(userDocRef, customUser, { merge: true });
-        console.log('User signed in with Google');
-    } catch (error) {
-        console.error('Error signing in with Google:', error);
-    }
-
 }
