@@ -31,10 +31,19 @@ export const loginPopup = async () => {
 
     const { user } = await signInWithPopup(auth, provider);
     console.log(user);
+
     const document = await getDoc(doc(db, 'users', user.uid));
     console.log(document);
 
     if (!document.exists() && user) {
+        const userRef = doc(db, 'users', user.uid);
+
+        const newCustomerUser: CustomerUser = {
+            uid: user.uid,
+            email: user.email || '',
+            role: UserRole.USER
+        };
+        await setDoc(userRef, newCustomerUser);
         console.log('!!! We have user !!!');
     }
 };
