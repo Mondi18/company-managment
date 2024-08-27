@@ -16,8 +16,7 @@ import {
     setDoc,
 } from 'firebase/firestore';
 import { Employee, Order } from "../data/type";
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
-
+import { GoogleAuthProvider } from "firebase/auth"
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -146,28 +145,3 @@ export const loginUser = async (email: string, password: string): Promise<void> 
         console.error('Error signin in:', error);
     }
 }
-
-// Login with Google auth
-
-export const signInWithGoogle = async (): Promise<void> => {
-    try {
-        const provider = new GoogleAuthProvider();
-
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        console.log(user);
-
-        const userDocRef = doc(db, 'users', user.uid);
-        const customUser: CustomerUser = {
-            uid: user.uid,
-            email: user.email || '',
-            role: UserRole.USER
-        };
-        await setDoc(userDocRef, customUser, { merge: true });
-        console.log('User signed in with Google');
-    } catch (error) {
-        console.error('Error signing in with Google:', error);
-    }
-
-}
-
