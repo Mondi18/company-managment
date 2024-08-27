@@ -68,7 +68,7 @@ const OrderList = () => {
             }
         };
         fetchOrders();
-    }, []);
+    }, [selectedOrder]);
 
     const formatDeadline = (deadline: Timestamp | Date) => {
         const date = deadline instanceof Timestamp ? deadline.toDate() : deadline;
@@ -83,8 +83,9 @@ const OrderList = () => {
         setSelectedOrder(null);
     };
     const handleAssignEmployee = () => {
-        if (selectedEmployee && selectedOrder) {
+        if (selectedEmployee?.id && selectedOrder?.id) {
             assignEmployeeToOrder(selectedOrder.id, selectedEmployee.id);
+            console.log(selectedEmployee.id, selectedOrder.id)
 
             handleCloseOrderDetails();
         }
@@ -142,15 +143,21 @@ const OrderList = () => {
                             </td>
                             <td><Button onClick={() => handleOpenOrderDetails(order)}>See the order</Button></td>
                             <Dialog open={!!selectedOrder} onClose={handleCloseOrderDetails}>
-                                <DialogTitle>Rendelés részletei</DialogTitle>
+                                <DialogTitle>Order Details</DialogTitle>
                                 <DialogContent>
                                     {selectedOrder && (
                                         <>
                                             <p>ID: {selectedOrder.id}</p>
                                             <p>Ár: {selectedOrder.price}</p>
+                                            <p>Pages: {selectedOrder.pages}</p>
+                                            <p>Style: {selectedOrder.style}</p>
+                                            <p>Service: {selectedOrder.service}</p>
+                                            <p>Deadline: {formatDeadline(selectedOrder.deadline)}</p>
+                                            <p>Notice: {selectedOrder.notice}</p>
+                                            <p>Status: {getStatusText(selectedOrder.status)}</p>
                                             {/* Add more order details here */}
                                             <FormControl fullWidth margin="normal">
-                                                <InputLabel>Alkalmazott hozzárendelése</InputLabel>
+                                                <InputLabel>Add Employee</InputLabel>
                                                 <Select
                                                     value={selectedEmployee ? selectedEmployee.id : ''}
                                                     onChange={(e) => {
@@ -171,7 +178,7 @@ const OrderList = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleAssignEmployee} disabled={!selectedEmployee}>
-                                        Alkalmazott hozzárendelése
+                                        Add Employee
                                     </Button>
                                     <Button onClick={handleCloseOrderDetails}>Bezárás</Button>
                                 </DialogActions>
