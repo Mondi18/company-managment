@@ -1,4 +1,5 @@
 export type Employee = {
+    id?: string,
     lastName: string,
     firstName: string,
     email: string,
@@ -7,9 +8,11 @@ export type Employee = {
     jobPosition: JobPosition,
     salary: number,
     isBusy: boolean,
+    ordersid?: string[] | null
 }
 
 export type Order = {
+    id?: string,
     web: Web,
     pages: number,
     style: WebStyle,
@@ -18,6 +21,7 @@ export type Order = {
     notice: string,
     status: WebStatus,
     price: number
+    employeeid?: string[] | null
 }
 
 export type CustomerUser = {
