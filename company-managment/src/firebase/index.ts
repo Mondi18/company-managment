@@ -48,7 +48,15 @@ export const loginPopup = async () => {
     }
 };
 
-export const logout = () => signOut(auth);
+export const logout = async (): Promise<void> =>  {
+    try {
+        signOut(auth);
+        console.log('User signed out'); 
+  
+    } catch (error) {
+        console.error('Error signing out:', error);
+    }
+}
 
 export const onAuthStateChangeListener = (callback: (user: User | null) => void) => {
     return onAuthStateChanged(auth, callback);
