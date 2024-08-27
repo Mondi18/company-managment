@@ -1,57 +1,44 @@
-import { useState, useEffect } from 'react'
-import { onAuthStateChangeListener } from '../firebase';
-import { User } from 'firebase/auth';
-import { Button, TextField } from '@mui/material';
-import { logout } from '../firebase';
-import { signInWithGoogle } from '../firebase';
-import { loginUser } from '../firebase';
+import { create, props } from '@stylexjs/stylex';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/use-auth';
+const LOGIN_STYLES = create({
+  container: {
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2rem',
+  },
+  button: {
+    display: 'flex',
+    gap: '.5rem',
+    alignItems: 'center',
+    fontSize: '2rem',
+    textTransform: 'uppercase',
+  },
+});
 
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const { loginWithGoogle } = useAuth();
 
+  const onLogin = () => {
+    loginWithGoogle().then(() => {
+      navigate('/employees-edit');
+    });
+  };
 
-const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [user, setUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChangeListener((currentUser) => {
-            setUser(currentUser);
-        });
-
-        return () => unsubscribe();
-    }, []);
-
-    return (
-        <div>
-            <h2>Login</h2>
-            {!user ? (
-                <>
-                    <TextField
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        size='small'
-                    />
-                    <TextField
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        size='small'
-                    />
-                    <Button variant="contained" onClick={() => loginUser(email, password)}>Login</Button>
-                    <hr />
-                    <Button variant="contained" onClick={signInWithGoogle}>Login with Google</Button>
-                </>
-            ) : (
-                <>
-                    <p>Welcome, {user.email}</p>
-                    <Button variant="contained" onClick={logout}>Logout</Button>
-                </>
-            )}
+  return (
+    <main {...props(LOGIN_STYLES.container)}>
+      <button onClick={onLogin}>
+        <div {...props(LOGIN_STYLES.button)}>
+        bejelentkezés
         </div>
-    );
+
+      </button>
+    </main>
+  );
 };
 
 export default Login;
