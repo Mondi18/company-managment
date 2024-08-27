@@ -33,7 +33,8 @@ const Login: React.FC = () => {
     <main {...props(LOGIN_STYLES.container)}>
       <button onClick={onLogin}>
         <div {...props(LOGIN_STYLES.button)}>
-        bejelentkezés
+          Login with Google
+       <img src='../public/google.png'/>
         </div>
 
       </button>
