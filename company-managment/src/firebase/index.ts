@@ -14,6 +14,7 @@ import {
     updateDoc,
     deleteDoc,
     setDoc,
+    arrayUnion
 } from 'firebase/firestore';
 import { Employee, Order } from "../data/type";
 import { GoogleAuthProvider } from "firebase/auth"
@@ -160,5 +161,33 @@ export const loginUser = async (email: string, password: string): Promise<void> 
         console.log('User signed in');
     } catch (error) {
         console.error('Error signin in:', error);
+    }
+}
+
+export const assignEmployeeToOrder = async (orderId: string, employeeId: string): Promise<void> => {
+    try {
+        const orderRef = doc(db, 'order', orderId);
+        const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
+
+        // Ellenőrizzük, hogy létezik-e az alkalmazott
+        const employeeSnap = await get(employeeRef);
+        if (!employeeSnap.exists()) {
+            throw new Error(`Employee with ID ${employeeId} does not exist`);
+        }
+
+        // Frissítjük a rendelést
+        await updateDoc(orderRef, {
+            employeeid: arrayUnion(employeeId)
+        });
+
+        // Frissítjük az alkalmazottat
+        await update(employeeRef, {
+            ordersid: arrayUnion(orderId)
+        });
+
+        console.log(`Employee ${employeeId} assigned to order ${orderId}`);
+    } catch (error) {
+        console.error('Error assigning employee to order:', error);
+        throw error;
     }
 }
