@@ -22,6 +22,7 @@ export type Order = {
     status: WebStatus,
     price: number
     employeeid?: string[] | null
+    Employees?: Employee[] | null
 }
 
 export type CustomerUser = {
