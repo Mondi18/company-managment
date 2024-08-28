@@ -8,7 +8,8 @@ export type Employee = {
     jobPosition: JobPosition,
     salary: number,
     isBusy: boolean,
-    ordersid?: string[] | null
+    ordersid?: string[] | null,
+    Orders?: Order[] | null
 }
 
 export type Order = {
