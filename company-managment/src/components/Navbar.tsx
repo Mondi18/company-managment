@@ -73,7 +73,7 @@ const Navbar = () => {
                                 Logout
                             </div>
                         ) : (
-                            <div {...props(styles.button)} onClick={() => navigate('/login')}>
+                            <div  {...props(styles.logout)} onClick={() => navigate('/login')}>
                                 Login
                             </div>
                         )}
