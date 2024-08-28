@@ -35,7 +35,6 @@ const OrderList = () => {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-
     useEffect(() => {
         const fetchEmployees = async () => {
             const employeesData = await listEmployees();
@@ -45,15 +44,16 @@ const OrderList = () => {
                     id
                 }));
                 setEmployees(formattedEmployees);
-                console.log(formattedEmployees);
             } else {
                 setEmployees([]);
             }
         }
         fetchEmployees();
-    }, []);
-
+    }, []);    
+    
+ 
     useEffect(() => {
+
         const fetchOrders = async () => {
             const ordersData = await listOrders();
             if (ordersData) {
@@ -61,14 +61,27 @@ const OrderList = () => {
                     ...order,
                     id
                 }));
+
+                formattedOrders.forEach(order => {
+                    if(order.employeeid && employees) {
+                        order.Employees = [];
+                        order.employeeid.forEach(employeeId => {
+                            const employee = employees.find(employee => employee.id === employeeId);
+                            if(employee) {
+                                order.Employees!.push(employee);
+                            }
+                        })                
+                    }
+                })
                 setOrders(formattedOrders);
-                console.log(formattedOrders);
+          
             } else {
                 setOrders([]);
+               
             }
         };
         fetchOrders();
-    }, [selectedOrder]);
+    }, [selectedOrder, employees]);
 
     const formatDeadline = (deadline: Timestamp | Date) => {
         const date = deadline instanceof Timestamp ? deadline.toDate() : deadline;
@@ -85,7 +98,6 @@ const OrderList = () => {
     const handleAssignEmployee = () => {
         if (selectedEmployee?.id && selectedOrder?.id) {
             assignEmployeeToOrder(selectedOrder.id, selectedEmployee.id);
-            console.log(selectedEmployee.id, selectedOrder.id)
 
             handleCloseOrderDetails();
         }
@@ -135,9 +147,9 @@ const OrderList = () => {
                             <td {...props(styles.tableCell)}>{getStatusText(order.status)}</td>
                             <td {...props(styles.tableCell)}>{order.price}</td>
                             <td {...props(styles.tableCell)}>
-                                {order.employeeid && order.employeeid.length > 0 ? (
-                                    order.employeeid.map((emp, i) => (
-                                        <p key={i}>{emp}</p>
+                                {order.Employees ? (
+                                    order.Employees.map(employee => (
+                                        <div key={employee.id}>{employee.jobPosition}</div>
                                     ))
                                 ) : (
                                     'Nincs hozzárendelve'
