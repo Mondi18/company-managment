@@ -89,7 +89,7 @@ const OrderList = () => {
             }
         };
         fetchOrders();
-    }, [selectedOrder, employees]);
+    }, [selectedOrder, employees, editOrder]);
 
     const formatDeadline = (deadline: Timestamp | Date) => {
         const date = deadline instanceof Timestamp ? deadline.toDate() : deadline;
@@ -171,6 +171,36 @@ const OrderList = () => {
                 return 'Ismeretlen';
         }
     };
+    const getWebText = (web: Web): string => {
+        switch (web) {
+            case Web.Blog:
+                return 'Bolg';
+            case Web.Webshop:
+                return 'Webshop';
+            case Web.Portfolio:
+                return 'Portfolio';
+            case Web.SpecificApplication:
+                return 'Specific Application';
+            default:
+                return 'Ismeretlen';
+        }
+    };
+
+    const getWebStyleText = (style: WebStyle): string => {
+        switch (style) {
+            case WebStyle.Modern:
+                return 'Modern';
+            case WebStyle.MobileFirst:
+                return 'Mobile First';
+            case WebStyle.Traditional:
+                return 'Traditional';
+            case WebStyle.Minimalist:
+                return 'Minimalist';
+            default:
+                return 'Ismeretlen';
+        }
+    };
+
 
 
     return (
@@ -194,9 +224,9 @@ const OrderList = () => {
                 <tbody>
                     {orders.map((order, index) => (
                         <tr key={index}>
-                            <td {...props(styles.tableCell)}>{order.web || "Ismeretlen"}</td>
+                            <td {...props(styles.tableCell)}>{getWebText(order.web) || "Ismeretlen"}</td>
                             <td {...props(styles.tableCell)}>{order.pages}</td>
-                            <td {...props(styles.tableCell)}>{order.style}</td>
+                            <td {...props(styles.tableCell)}>{getWebStyleText(order.style) || "Ismeretlen"}</td>
                             <td {...props(styles.tableCell)}>{order.service ? 'Igen' : 'Nem'}</td>
                             <td {...props(styles.tableCell)}>{formatDeadline(order.deadline)}</td>
                             <td {...props(styles.tableCell)}>{order.notice}</td>
@@ -278,12 +308,12 @@ const OrderList = () => {
 
                                     {editOrder && (
                                         <div>
-                                            {/* Web Style */}
+                                            {/* Web */}
                                             <FormControl fullWidth margin="normal">
                                                 <InputLabel>Web</InputLabel>
                                                 <Select
-                                                    value={editOrder?.web !== undefined ? editOrder.web.toString() : ''}
-                                                    onChange={(e) => setEditOrder({ ...editOrder!, web: parseInt(e.target.value) as Web })}
+                                                    value={editOrder?.web !== undefined ? editOrder.web : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, web: e.target.value as Web })}
                                                 >
                                                     {Object.keys(Web)
                                                         .filter(key => isNaN(Number(key)))
@@ -307,8 +337,8 @@ const OrderList = () => {
                                             <FormControl fullWidth margin="normal">
                                                 <InputLabel>Web Style</InputLabel>
                                                 <Select
-                                                    value={editOrder?.style !== undefined ? editOrder.style.toString() : ''}
-                                                    onChange={(e) => setEditOrder({ ...editOrder!, style: parseInt(e.target.value) as WebStyle })}
+                                                    value={editOrder?.style !== undefined ? editOrder.style : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, style: e.target.value as WebStyle })}
                                                 >
                                                     {Object.keys(WebStyle)
                                                         .filter(key => isNaN(Number(key))) // Only get the string keys, not the enum values
