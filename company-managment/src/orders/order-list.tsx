@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { listOrders, listEmployees, assignEmployeeToOrder } from '../firebase';
 import { Order, WebStatus } from "../data/type";
-import { Table, Button, Dialog, DialogTitle, DialogActions, DialogContent, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Table, Button, Dialog, DialogTitle, DialogActions, DialogContent, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
 import { props, create } from "@stylexjs/stylex";
 import { Timestamp } from 'firebase/firestore';
 import { Employee } from '../data/type';
+import { Web } from '../data/type';
+import { WebStyle } from '../data/type';
 import { deleteEmployeeFromOrder } from '../firebase';
+import { updateOrder } from '../firebase';
+
 
 const styles = create({
     headerCell: {
@@ -36,6 +40,9 @@ const OrderList = () => {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+    const [editOrder, setEditOrder] = useState<Order | null>(null);
+
+
     useEffect(() => {
         const fetchEmployees = async () => {
             const employeesData = await listEmployees();
@@ -103,7 +110,22 @@ const OrderList = () => {
             handleCloseOrderDetails();
         }
     };
+    const handleSave = async () => {
+        try {
+            if (editOrder) {
+                await updateOrder(editOrder.id!, editOrder);
+                console.log('Order updated successfully');
+                setEditOrder(null);
+            }
+            else {
+                console.error('No order to update');
+            }
 
+
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+    };
     const handleDelete = async (orderId: string, employeeId: string) => {
         if (!orderId || !employeeId) {
             console.error('Invalid orderId or employeeId');
@@ -129,6 +151,14 @@ const OrderList = () => {
         }
     };
 
+    const handleOpenEditOrder = (order: Order) => {
+        setEditOrder(order);
+    };
+
+    const handleCloseEditOrder = () => {
+        setEditOrder(null);
+    };
+
     const getStatusText = (status: WebStatus): string => {
         switch (status) {
             case WebStatus.Processing:
@@ -141,6 +171,7 @@ const OrderList = () => {
                 return 'Ismeretlen';
         }
     };
+
 
     return (
         <div>
@@ -157,6 +188,7 @@ const OrderList = () => {
                         <th {...props(styles.headerCell)}>Price</th>
                         <th {...props(styles.headerCell)}>Employee</th>
                         <th {...props(styles.headerCell)}>View</th>
+                        <th {...props(styles.headerCell)}>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,6 +212,8 @@ const OrderList = () => {
                                 )}
                             </td>
                             <td><Button onClick={() => handleOpenOrderDetails(order)}>See the order</Button></td>
+                            <td><Button onClick={() => handleOpenEditOrder(order)}>Update</Button></td>
+
                             <Dialog open={!!selectedOrder} onClose={handleCloseOrderDetails}>
                                 <DialogTitle>Order Details</DialogTitle>
                                 <DialogContent>
@@ -238,6 +272,126 @@ const OrderList = () => {
                                     <Button onClick={handleCloseOrderDetails}>Bezárás</Button>
                                 </DialogActions>
                             </Dialog>
+                            <Dialog open={!!editOrder} onClose={handleCloseEditOrder}>
+                                <DialogTitle>Edit Details</DialogTitle>
+                                <DialogContent>
+
+                                    {editOrder && (
+                                        <div>
+                                            {/* Web Style */}
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Web</InputLabel>
+                                                <Select
+                                                    value={editOrder?.web !== undefined ? editOrder.web.toString() : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, web: parseInt(e.target.value) as Web })}
+                                                >
+                                                    {Object.keys(Web)
+                                                        .filter(key => isNaN(Number(key)))
+                                                        .map((key) => (
+                                                            <MenuItem key={key} value={Web[key as keyof typeof Web]}>
+                                                                {key}
+                                                            </MenuItem>
+                                                        ))}
+                                                </Select>
+                                            </FormControl>
+                                            {/* Pages mező */}
+                                            <TextField
+                                                fullWidth
+                                                margin="normal"
+                                                label="Pages"
+                                                type="number"
+                                                value={editOrder.pages.toString()}
+                                                onChange={(e) => setEditOrder({ ...editOrder, pages: parseInt(e.target.value) })}
+                                            />
+                                            {/* Web Style */}
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Web Style</InputLabel>
+                                                <Select
+                                                    value={editOrder?.style !== undefined ? editOrder.style.toString() : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, style: parseInt(e.target.value) as WebStyle })}
+                                                >
+                                                    {Object.keys(WebStyle)
+                                                        .filter(key => isNaN(Number(key))) // Only get the string keys, not the enum values
+                                                        .map((key) => (
+                                                            <MenuItem key={key} value={WebStyle[key as keyof typeof WebStyle]}>
+                                                                {key}
+                                                            </MenuItem>
+                                                        ))}
+                                                </Select>
+                                            </FormControl>
+                                            {/* Service */}
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Service</InputLabel>
+                                                <Select
+                                                    value={editOrder?.service !== undefined ? editOrder.service.toString() : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, service: e.target.value === 'true' })}
+                                                >
+                                                    <MenuItem value="true">Igen</MenuItem>
+                                                    <MenuItem value="false">Nem</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                            {/* Deadline mező */}
+                                            <TextField
+                                                fullWidth
+                                                margin="normal"
+                                                label="Deadline"
+                                                type="date"
+                                                value={editOrder.deadline instanceof Date && !isNaN(editOrder.deadline.getTime())
+                                                    ? editOrder.deadline.toISOString().substring(0, 10)
+                                                    : ''}
+                                                onChange={(e) => {
+                                                    const date = new Date(e.target.value);
+                                                    if (!isNaN(date.getTime())) {
+                                                        setEditOrder({ ...editOrder, deadline: date });
+                                                    }
+                                                }}
+                                            />
+                                            {/* Notice mező */}
+                                            <TextField
+                                                fullWidth
+                                                margin="normal"
+                                                label="Notice"
+                                                multiline
+                                                rows={4}
+                                                value={editOrder.notice}
+                                                onChange={(e) => setEditOrder({ ...editOrder, notice: e.target.value })}
+                                            />
+                                            {/* Status */}
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Status</InputLabel>
+                                                <Select
+                                                    value={editOrder?.status !== undefined ? editOrder.status.toString() : ''}
+                                                    onChange={(e) => setEditOrder({ ...editOrder!, status: parseInt(e.target.value) as WebStatus })}
+                                                >
+                                                    {Object.keys(WebStatus)
+                                                        .filter(key => isNaN(Number(key))) // Only get the string keys, not the enum values
+                                                        .map((key) => (
+                                                            <MenuItem key={key} value={WebStatus[key as keyof typeof WebStatus]}>
+                                                                {key}
+                                                            </MenuItem>
+                                                        ))}
+                                                </Select>
+                                            </FormControl>
+                                            {/* Price mező */}
+                                            <TextField
+                                                fullWidth
+                                                margin="normal"
+                                                label="Price"
+                                                type="number"
+                                                value={editOrder.price.toString()}
+                                                onChange={(e) => setEditOrder({ ...editOrder, price: parseFloat(e.target.value) })}
+                                            />
+                                        </div>
+                                    )}
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleSave} disabled={!updateOrder}>
+                                        Update Order
+                                    </Button>
+                                    <Button onClick={handleCloseOrderDetails}>Close</Button>
+                                </DialogActions>
+                            </Dialog>
+
                         </tr>
 
                     ))}
