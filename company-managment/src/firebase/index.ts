@@ -14,7 +14,8 @@ import {
     updateDoc,
     deleteDoc,
     setDoc,
-    arrayUnion
+    arrayUnion,
+    arrayRemove
 } from 'firebase/firestore';
 import { Employee, Order } from "../data/type";
 import { GoogleAuthProvider } from "firebase/auth"
@@ -49,11 +50,11 @@ export const loginPopup = async () => {
     }
 };
 
-export const logout = async (): Promise<void> =>  {
+export const logout = async (): Promise<void> => {
     try {
         signOut(auth);
-        console.log('User signed out'); 
-  
+        console.log('User signed out');
+
     } catch (error) {
         console.error('Error signing out:', error);
     }
@@ -168,6 +169,8 @@ export const assignEmployeeToOrder = async (orderId: string, employeeId: string)
     try {
         const orderRef = doc(db, 'order', orderId);
         const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
+        console.log(employeeRef);
+        console.log(orderRef)
 
         // Ellenőrizzük, hogy létezik-e az alkalmazott
         const employeeSnap = await get(employeeRef);
@@ -188,6 +191,39 @@ export const assignEmployeeToOrder = async (orderId: string, employeeId: string)
         console.log(`Employee ${employeeId} assigned to order ${orderId}`);
     } catch (error) {
         console.error('Error assigning employee to order:', error);
+        throw error;
+    }
+}
+
+export const deleteEmployeeFromOrder = async (orderId: string, employeeId: string): Promise<void> => {
+    try {
+        // Firestore order document reference
+        const orderRef = doc(db, 'order', orderId);
+
+        // Realtime Database employee reference
+        const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
+        const employeeSnapshot = await get(employeeRef);
+        const orderSnapshot = await getDoc(orderRef);
+
+        if (!employeeSnapshot.exists() || !orderSnapshot.exists()) {
+            throw new Error('Order or Employee not found');
+        }
+
+
+        await updateDoc(orderRef, {
+            employeeid: arrayRemove(employeeId),
+
+        });
+
+
+        await update(employeeRef, {
+            ordersid: arrayRemove(orderId)
+
+        });
+
+        console.log(`Employee ${employeeId} deleted from order ${orderId}`);
+    } catch (error) {
+        console.error('Error deleting employee from order:', error);
         throw error;
     }
 }

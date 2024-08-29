@@ -5,6 +5,7 @@ import { Table, Button, Dialog, DialogTitle, DialogActions, DialogContent, FormC
 import { props, create } from "@stylexjs/stylex";
 import { Timestamp } from 'firebase/firestore';
 import { Employee } from '../data/type';
+import { deleteEmployeeFromOrder } from '../firebase';
 
 const styles = create({
     headerCell: {
@@ -49,9 +50,9 @@ const OrderList = () => {
             }
         }
         fetchEmployees();
-    }, []);    
-    
- 
+    }, []);
+
+
     useEffect(() => {
 
         const fetchOrders = async () => {
@@ -63,21 +64,21 @@ const OrderList = () => {
                 }));
 
                 formattedOrders.forEach(order => {
-                    if(order.employeeid && employees) {
+                    if (order.employeeid && employees) {
                         order.Employees = [];
                         order.employeeid.forEach(employeeId => {
                             const employee = employees.find(employee => employee.id === employeeId);
-                            if(employee) {
+                            if (employee) {
                                 order.Employees!.push(employee);
                             }
-                        })                
+                        })
                     }
                 })
                 setOrders(formattedOrders);
-          
+
             } else {
                 setOrders([]);
-               
+
             }
         };
         fetchOrders();
@@ -103,7 +104,30 @@ const OrderList = () => {
         }
     };
 
-
+    const handleDelete = async (orderId: string, employeeId: string) => {
+        if (!orderId || !employeeId) {
+            console.error('Invalid orderId or employeeId');
+            return;
+        }
+        try {
+            console.log(orderId, employeeId);
+            await deleteEmployeeFromOrder(orderId, employeeId);
+            // Update the local state after successful deletion
+            setSelectedOrder(prevOrder => {
+                if (prevOrder && prevOrder.id === orderId) {
+                    return {
+                        ...prevOrder,
+                        Employees: prevOrder.Employees?.filter(emp => emp.id !== employeeId)
+                    };
+                }
+                return prevOrder;
+            });
+            // Optionally, you can also update the orders state here if needed
+        } catch (error) {
+            console.error('Error deleting employee from order:', error);
+            // Optionally, you can show an error message to the user here
+        }
+    };
 
     const getStatusText = (status: WebStatus): string => {
         switch (status) {
@@ -159,6 +183,7 @@ const OrderList = () => {
                             <Dialog open={!!selectedOrder} onClose={handleCloseOrderDetails}>
                                 <DialogTitle>Order Details</DialogTitle>
                                 <DialogContent>
+
                                     {selectedOrder && (
                                         <>
                                             <p>ID: {selectedOrder.id}</p>
@@ -169,7 +194,23 @@ const OrderList = () => {
                                             <p>Deadline: {formatDeadline(selectedOrder.deadline)}</p>
                                             <p>Notice: {selectedOrder.notice}</p>
                                             <p>Status: {getStatusText(selectedOrder.status)}</p>
-                                            {/* Add more order details here */}
+                                            <div>
+                                                <strong>Employees:</strong>
+                                                {selectedOrder.Employees ?
+                                                    selectedOrder.Employees.map(employee => (
+                                                        <div key={employee.id} style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            marginBottom: '5px'
+                                                        }}>
+                                                            <span>{employee.lastName}</span>
+                                                            <button onClick={() => selectedOrder.id && employee.id && handleDelete(selectedOrder.id, employee.id)}>Delete</button>
+                                                        </div>
+                                                    ))
+                                                    : 'Nincs hozzárendelve'}
+                                            </div>
+
                                             <FormControl fullWidth margin="normal">
                                                 <InputLabel>Add Employee</InputLabel>
                                                 <Select
