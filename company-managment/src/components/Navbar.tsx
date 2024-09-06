@@ -5,26 +5,61 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/use-auth';
+import { useEffect } from 'react';
+
+
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { user,logout } = useAuth();
+    const { user, role, logout } = useAuth();
+
     const handleLogout = () => {
-        logout();
-        navigate('/login');
+        logout().then(() => {
+            navigate('/login');
+        })
     }
+
+    useEffect(() => {
+
+        console.log("User or role changed:", role);
+    }, [user, role]);
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
                 <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        CompanyManagment
+                        CompanyManagement
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                        {user? <Button color="inherit" onClick={handleLogout}>Logout</Button> : <Button color="inherit" onClick={() => navigate("/login")}>Login</Button>}
-                        <Button color="inherit" onClick={() => navigate("employees-list")}>Employees</Button>
-                        <Button color="inherit" onClick={() => navigate("home")}>Home</Button>
-                        <Button color="inherit" onClick={() => navigate("order-form")}>Contact</Button>
+                        {user ? (
+                            <>
+
+                                {role === "user" && (
+                                    <>
+
+                                        <Button color="inherit" onClick={() => navigate("/my-orders")}>My Orders</Button>
+                                        <Button color="inherit" onClick={() => navigate("/order-form")}>Contact Us</Button>
+                                    </>
+                                )}
+
+
+                                {role === "admin" && (
+                                    <>
+                                        <Button color="inherit" onClick={() => navigate("/employees-list")}>Employees</Button>
+                                        <Button color="inherit" onClick={() => navigate("/order-list")}>Orders</Button>
+                                    </>
+                                )}
+
+
+                                <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button color="inherit" onClick={() => navigate("/login")}>Login</Button>
+                                <Button color="inherit" onClick={() => navigate("/home")}>Home</Button>
+                            </>
+                        )}
                     </Box>
                 </Toolbar>
             </AppBar>
