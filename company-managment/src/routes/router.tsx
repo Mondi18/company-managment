@@ -7,6 +7,7 @@ import EmployeesList from "../employees/employees-list";
 import OrderForm from "../orders/order-form";
 import OrderList from "../orders/order-list";
 import Register from "../components/Register";
+import OrderDetails from "../components/OrderDetails";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
             {
                 path: 'order-form',
                 element: <OrderForm />
+            },
+            {
+                path: '/order-details/:orderId',
+                element: <OrderDetails />
             }
         ],
     },
