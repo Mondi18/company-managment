@@ -3,6 +3,7 @@ import { firebaseConfig } from "./config";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import { get, getDatabase, ref, set, push, update, remove } from "firebase/database";
 import { CustomerUser, UserRole } from "../data/type";
+import { Timestamp } from "firebase/firestore";
 
 import {
     collection,
@@ -111,10 +112,18 @@ export const listOrders = async (): Promise<Record<string, Order> | undefined> =
 }
 
 export const getOrderById = async (orderId: string): Promise<Order | undefined> => {
-    const OrderRef = doc(db, 'order', orderId);
-    const snapshot = await getDoc(OrderRef);
+    const orderRef = doc(db, 'order', orderId);
+    const snapshot = await getDoc(orderRef);
     if (!snapshot.exists()) return undefined;
-    return snapshot.data() as Order;
+
+    const orderData = snapshot.data();
+
+    return {
+        ...orderData,
+        deadline: (orderData?.deadline instanceof Timestamp)
+            ? orderData.deadline.toDate()
+            : orderData?.deadline
+    } as Order;
 }
 
 export const updateOrder = async (orderId: string, partialOrder: Partial<Order>): Promise<void> => {
@@ -169,23 +178,27 @@ export const assignEmployeeToOrder = async (orderId: string, employeeId: string)
     try {
         const orderRef = doc(db, 'order', orderId);
         const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
-        console.log(employeeRef);
-        console.log(orderRef)
+        console.log(employeeId, orderId)
 
-        // Ellenőrizzük, hogy létezik-e az alkalmazott
+        // Fetch the employee data
         const employeeSnap = await get(employeeRef);
         if (!employeeSnap.exists()) {
             throw new Error(`Employee with ID ${employeeId} does not exist`);
         }
+        const orderSnap = await getDoc(orderRef);
+        if (!orderSnap.exists()) {
+            throw new Error(`Order with ID ${orderId} does not exist`);
+        }
+        const employeeData = employeeSnap.val();
 
-        // Frissítjük a rendelést
         await updateDoc(orderRef, {
-            employeeid: arrayUnion(employeeId)
+            employeeid: arrayUnion(employeeId),
+            Employees: arrayUnion(employeeData)
         });
 
-        // Frissítjük az alkalmazottat
+
         await update(employeeRef, {
-            ordersid: arrayUnion(orderId)
+            ordersid: arrayUnion(orderId),
         });
 
         console.log(`Employee ${employeeId} assigned to order ${orderId}`);
@@ -194,31 +207,43 @@ export const assignEmployeeToOrder = async (orderId: string, employeeId: string)
         throw error;
     }
 }
-
 export const deleteEmployeeFromOrder = async (orderId: string, employeeId: string): Promise<void> => {
     try {
-        // Firestore order document reference
         const orderRef = doc(db, 'order', orderId);
-
-        // Realtime Database employee reference
         const employeeRef = ref(realtime, `/work/employee/${employeeId}`);
-        const employeeSnapshot = await get(employeeRef);
-        const orderSnapshot = await getDoc(orderRef);
+        console.log(employeeId, orderId)
 
-        if (!employeeSnapshot.exists() || !orderSnapshot.exists()) {
-            throw new Error('Order or Employee not found');
+        // Fetch the employee data
+        const employeeSnap = await get(employeeRef);
+        if (!employeeSnap.exists()) {
+            throw new Error(`Employee with ID ${employeeId} does not exist`);
+        }
+        const employeeData = employeeSnap.val();
+        console.log('Fetched employee data:', employeeData);
+
+        // Fetch the order data
+        const orderSnap = await getDoc(orderRef);
+        if (!orderSnap.exists()) {
+            throw new Error(`Order with ID ${orderId} does not exist`);
+        }
+        const orderData = orderSnap.data();
+        console.log('Fetched order data:', orderData);
+
+
+        if (orderData) {
+            // Filter out the employee from the Employees array by email
+            const updatedEmployees = orderData.Employees?.filter((emp: { email: string }) => emp.email !== employeeData.email) || [];
+
+            // Update the order document
+            await updateDoc(orderRef, {
+                employeeid: arrayRemove(employeeId), // Ensure you remove the employee ID
+                Employees: updatedEmployees // Set the filtered array
+            });
         }
 
 
-        await updateDoc(orderRef, {
-            employeeid: arrayRemove(employeeId),
-
-        });
-
-
         await update(employeeRef, {
-            ordersid: arrayRemove(orderId)
-
+            ordersid: arrayRemove(orderId),
         });
 
         console.log(`Employee ${employeeId} deleted from order ${orderId}`);
