@@ -21,8 +21,12 @@ const Navbar = () => {
 
     useEffect(() => {
 
-        console.log("User or role changed:", role);
-    }, [user, role]);
+        if (role === "admin") {
+            navigate("/order-list")
+        } else {
+            navigate("/home")
+        }
+    }, [user, role, navigate]);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
