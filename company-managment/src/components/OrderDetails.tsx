@@ -99,6 +99,7 @@ const OrderDetails = () => {
             try {
                 await updateOrder(orderId, order);
                 console.log("Order is updated!");
+                navigate("/order-list");
             } catch (e) {
                 console.error(e);
             };
@@ -192,9 +193,9 @@ const OrderDetails = () => {
                                     value={order.status}
                                     onChange={(e) => setOrder(prev => prev ? { ...prev, status: e.target.value as WebStatus } : null)}
                                 >
-                                    <MenuItem value={WebStatus.Processing}>Feldolgozás alatt</MenuItem>
-                                    <MenuItem value={WebStatus.InProgress}>Folyamatban</MenuItem>
-                                    <MenuItem value={WebStatus.Completed}>Befejezve</MenuItem>
+                                    <MenuItem value={WebStatus.Processing}>Processing</MenuItem>
+                                    <MenuItem value={WebStatus.InProgress}>In Progress</MenuItem>
+                                    <MenuItem value={WebStatus.Completed}>Done</MenuItem>
                                 </Select>
                             </FormControl>
 
@@ -251,9 +252,11 @@ const OrderDetails = () => {
                                     <li key={employee.id} {...props(styles.listItem)}>
                                         {employee.lastName}
                                         <Tooltip title="Delete Employee">
-                                            <IconButton onClick={() => handleDeleteEmployee(employee.id || '')}>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <span>
+                                                <IconButton onClick={() => handleDeleteEmployee(employee.id || '')}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </span>
                                         </Tooltip>
                                     </li>
                                 ))}
@@ -278,9 +281,11 @@ const OrderDetails = () => {
                                 </Select>
                             </FormControl>
                             <Tooltip title="Add Employee">
-                                <IconButton onClick={handleAssignEmployee} disabled={!selectedEmployee}>
-                                    <AddIcon />
-                                </IconButton>
+                                <span>
+                                    <IconButton onClick={handleAssignEmployee} disabled={!selectedEmployee}>
+                                        <AddIcon />
+                                    </IconButton>
+                                </span>
                             </Tooltip>
                         </CardContent>
                     </Card>

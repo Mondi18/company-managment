@@ -21,16 +21,17 @@ export type Order = {
     deadline: Date,
     notice: string,
     status: WebStatus,
-    price: number
-    employeeid?: string[] | null
-    Employees?: Employee[] | null
+    price: number,
+    employeeid?: string[] | null,
+    Employees?: Employee[] | null,
+    userId: string
 }
 
 export type CustomerUser = {
     uid: string,
     email: string,
     role: UserRole,
-    ordersid?: Order[];
+    ordersid?: Order[]
 }
 
 export enum UserRole {

@@ -94,15 +94,17 @@ const OrderList = () => {
     const getStatusText = (status: WebStatus): string => {
         switch (status) {
             case WebStatus.Processing:
-                return 'Feldolgozás alatt';
+                return 'Processing';
             case WebStatus.InProgress:
-                return 'Folyamatban';
+                return 'InProgress';
             case WebStatus.Completed:
-                return 'Befejezve';
+                return 'Completed';
             default:
-                return 'Ismeretlen';
+                return 'Unknown';
         }
     };
+
+
     const getWebText = (web: Web): string => {
         switch (web) {
             case Web.Blog:
@@ -162,14 +164,14 @@ const OrderList = () => {
                             <td {...props(styles.tableCell)}>{formatDeadline(order.deadline)}</td>
                             <td {...props(styles.tableCell)}>{order.notice}</td>
                             <td {...props(styles.tableCell)}>{getStatusText(order.status)}</td>
-                            <td {...props(styles.tableCell)}>{order.price}</td>
+                            <td {...props(styles.tableCell)}>{order.price} $</td>
                             <td {...props(styles.tableCell)}>
                                 {order.Employees ? (
                                     order.Employees.map(employee => (
                                         <div key={employee.id}>{employee.jobPosition}</div>
                                     ))
                                 ) : (
-                                    'Nincs hozzárendelve'
+                                    'No Employees'
                                 )}
                             </td>
                             <td><Button onClick={() => handleOpenOrderDetails(order)}>See the order</Button></td>
@@ -182,10 +184,11 @@ const OrderList = () => {
                                     {selectedOrder && (
                                         <>
                                             <p>ID: {selectedOrder.id}</p>
-                                            <p>Ár: {selectedOrder.price}</p>
+                                            <p>Price: {selectedOrder.price} $</p>
+                                            <p>Application: {getWebText(selectedOrder.web)}</p>
                                             <p>Pages: {selectedOrder.pages}</p>
-                                            <p>Style: {selectedOrder.style}</p>
-                                            <p>Service: {selectedOrder.service}</p>
+                                            <p>Style: {getWebStyleText(selectedOrder.style)}</p>
+                                            <p>Service: {selectedOrder.service ? "Yes" : "No"}</p>
                                             <p>Deadline: {formatDeadline(selectedOrder.deadline)}</p>
                                             <p>Notice: {selectedOrder.notice}</p>
                                             <p>Status: {getStatusText(selectedOrder.status)}</p>
@@ -203,7 +206,9 @@ const OrderList = () => {
 
                                                         </div>
                                                     ))
-                                                    : 'Nincs hozzárendelve'}
+                                                    : <div>
+                                                        No employees yet
+                                                    </div>}
                                             </div>
                                         </>
                                     )}

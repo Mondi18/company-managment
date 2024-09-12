@@ -91,11 +91,42 @@ export const deleteEmployee = async (employeeId: string): Promise<void> => {
 
 //Order CRUD operations
 
-export const addOrder = async (order: Order): Promise<Order> => {
-    const OrderRef = collection(db, 'order');
-    await addDoc(OrderRef, order);
-    return order;
-}
+export const addOrder = async (order: Order, userId: string): Promise<Order> => {
+    try {
+
+        const UserDocRef = doc(db, 'users', userId);
+        const UserDoc = await getDoc(UserDocRef);
+
+        if (!UserDoc.exists()) {
+            throw new Error('CustomerUser not found');
+        }
+
+        const customerUser = UserDoc.data() as CustomerUser;
+
+
+        const newOrder: Order = {
+            ...order,
+            userId: customerUser.uid
+        };
+
+
+        const OrderRef = collection(db, 'order');
+        const OrderDoc = await addDoc(OrderRef, newOrder);
+
+        const newOrderId = OrderDoc.id;
+
+        await updateDoc(UserDocRef, {
+            ordersid: arrayUnion(newOrderId) // Add the order id to the user's ordersid array
+        });
+
+        return { ...newOrder, id: newOrderId };
+
+        return newOrder;
+    } catch (error) {
+        console.error("Error adding order:", error);
+        throw error; // Re-throw the error to be handled in the caller
+    }
+};
 
 export const listOrders = async (): Promise<Record<string, Order> | undefined> => {
     const OrderRef = collection(db, 'order');
